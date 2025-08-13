@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% block title %}Tasks - SuperProd{% endblock %}
+
+{% block content %}
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    height: auto !important;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .list-group-item {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .row.g-4 > .col-md-6 {
+    margin-bottom: 1.5rem;
+  }
+
+  /* Fullscreen styles for focus mode */
+  .fullscreen-card {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 1050;
+    background-color: white !important;
+    overflow-y: auto;
+    padding: 2rem !important;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    border-radius: 0 !important;
+  }
+
+  /* Play button style */
+  .btn-play {
+    font-size: 1.25rem;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Disabled done button */
+  .btn-disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+</style>
+
+<h1 class="mb-4">Your Tasks</h1>
+
+<!-- Add Task Form -->
+<form method="POST" action="{{ url_for('add_task') }}" class="mb-4">
+  <div class="row g-2 align-items-center">
+    <div class="col-sm-4">
+      <input type="text" class="form-control" name="title" placeholder="New task title" required />
+    </div>
+    <div class="col-sm-3">
+      <input type="date" class="form-control" name="deadline" />
+    </div>
+    <div class="col-sm-3">
+      <input type="number" class="form-control" name="duration_minutes" placeholder="Duration (mins)" min="1" />
+    </div>
+    <div class="col-sm-2 d-grid">
+      <button type="submit" class="btn btn-primary">Add Task</button>
+    </div>
+  </div>
+</form>
+
+<!-- Tasks Cards Grid -->
+<div class="row g-4" style="align-items: start;">
+  {% for task in tasks %}
+  <div class="col-md-6 d-flex">
+    <div class="card p-3 shadow-sm flex-grow-1" style="background-color: {{ task.color }};" id="task-card-{{ task.id }}">
+      <!-- Task header -->
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h5 class="card-title mb-1 {% if task.is_done %}text-decoration-line-through{% endif %}">{{ task.title }}</h5>
+          <small class="text-muted">
+            {% if task.deadline %}Due: {{ task.deadline.strftime('%b %d, %Y') }} {% endif %}
+            {% if task.duration_minutes %} | Duration: {{ task.duration_minutes }} mins{% endif %}
+          </small>
+        </div>
+        <div class="d-flex flex-column gap-1 align-items-end">
+
+          <!-- Play button replaces Start -->
+          {% if not task.is_done %}
+            {% if not task.started_at %}
+              <a href="{{ url_for('start_task', task_id=task.id) }}" class="btn btn-sm btn-success mb-1 btn-play" title="Play">
+                ▶️
+              </a>
+            {% else %}
+              <span class="badge bg-info text-dark countdown"
+                    data-start="{{ task.started_at.isoformat() }}"
+                    data-duration="{{ task.duration_minutes }}">
+              </span>
+            {% endif %}
+          {% endif %}
+
+          <!-- Done/Undo button, disable if subtasks not all done -->
+          {% set all_subtasks_done = task.subtasks | length == 0 or task.subtasks | selectattr('is_done') | list | length == task.subtasks | length %}
+          <a href="{{ url_for('toggle_task', task_id=task.id) }}"
+             class="btn btn-sm btn-secondary mb-1 {% if not all_subtasks_done %}btn-disabled{% endif %}">
+            {% if task.is_done %}Undo{% else %}Done{% endif %}
+          </a>
+
+          <a href="{{ url_for('delete_task', task_id=task.id) }}" class="btn btn-sm btn-danger"
+             onclick="return confirm('Delete this task?');">&times;</a>
+        </div>
+      </div>
+
+      <!-- Subtasks -->
+      {% if task.subtasks %}
+      <ul class="list-group list-group-flush mt-3">
+        {% for subtask in task.subtasks %}
+        <li class="list-group-item d-flex justify-content-between align-items-center py-1 px-2">
+          <span class="{% if subtask.is_done %}text-decoration-line-through{% endif %}">{{ subtask.title }}</span>
+          <a href="{{ url_for('toggle_subtask', task_id=task.id, subtask_index=loop.index0) }}"
+             class="btn btn-sm btn-outline-secondary">
+            {% if subtask.is_done %}Undo{% else %}Done{% endif %}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <!-- Add Subtask Form -->
+      <form method="POST" action="{{ url_for('add_subtask', task_id=task.id) }}" class="mt-3 d-flex gap-2">
+        <input type="text" class="form-control form-control-sm" name="subtask_title" placeholder="New subtask" required />
+        <button class="btn btn-outline-primary btn-sm" type="submit">Add</button>
+      </form>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-muted">No tasks yet. Add one above!</p>
+  {% endfor %}
+</div>
+
+<!-- Countdown Timer Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const timers = document.querySelectorAll('.countdown');
+  timers.forEach(timer => {
+    const start = new Date(timer.dataset.start);
+    const duration = parseInt(timer.dataset.duration) * 60 * 1000; // convert mins to ms
+    const end = new Date(start.getTime() + duration);
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = end - now;
+      if (diff <= 0) {
+        timer.textContent = "Time's up!";
+        timer.classList.remove('bg-info');
+        timer.classList.add('bg-danger', 'text-white');
+        return;
+      }
+      const mins = Math.floor(diff / 60000);
+      const secs = Math.floor((diff % 60000) / 1000);
+      timer.textContent = `${mins}m ${secs}s left`;
+      requestAnimationFrame(updateCountdown);
+    }
+    updateCountdown();
+  });
+});
+
+// Focus Mode / Fullscreen for task cards
+function enterFocusMode(taskId) {
+  const card = document.getElementById('task-card-' + taskId);
+  if (!card) return;
+
+  card.classList.add('fullscreen-card');
+
+  // Optionally scroll to top for better UX
+  window.scrollTo(0, 0);
+
+  // Add a close button for exiting focus mode
+  if (!document.getElementById('focus-exit-btn')) {
+    const exitBtn = document.createElement('button');
+    exitBtn.id = 'focus-exit-btn';
+    exitBtn.innerText = 'Exit Focus';
+    exitBtn.style.position = 'fixed';
+    exitBtn.style.top = '10px';
+    exitBtn.style.right = '10px';
+    exitBtn.style.zIndex = '1100';
+    exitBtn.className = 'btn btn-danger btn-sm';
+    exitBtn.onclick = function() {
+      card.classList.remove('fullscreen-card');
+      exitBtn.remove();
+    };
+    document.body.appendChild(exitBtn);
+  }
+}
+</script>
+{% endblock %}

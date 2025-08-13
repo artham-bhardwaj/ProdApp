@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Sign Up - Task App{% endblock %}
+
+{% block content %}
+  <h2 style="text-align: center; margin-bottom: 2rem; font-weight: 700; letter-spacing: 1px;">
+    Create an Account
+  </h2>
+
+  <form id="signup-form" style="max-width: 400px; margin: 0 auto;">
+    <div style="margin-bottom: 1.2rem;">
+      <input
+        type="email"
+        id="signup-email"
+        placeholder="Email"
+        required
+        autocomplete="email"
+        style="
+          width: 100%;
+          padding: 0.65rem 1rem;
+          font-size: 1rem;
+          border-radius: 8px;
+          border: none;
+          background-color: var(--input-bg);
+          color: var(--input-text);
+          outline-offset: 2px;
+          outline-color: transparent;
+          transition: outline-color 0.3s ease;
+        "
+        onfocus="this.style.outlineColor='var(--accent-color)'"
+        onblur="this.style.outlineColor='transparent'"
+      />
+    </div>
+    <div style="margin-bottom: 1.8rem;">
+      <input
+        type="password"
+        id="signup-password"
+        placeholder="Password"
+        required
+        autocomplete="new-password"
+        style="
+          width: 100%;
+          padding: 0.65rem 1rem;
+          font-size: 1rem;
+          border-radius: 8px;
+          border: none;
+          background-color: var(--input-bg);
+          color: var(--input-text);
+          outline-offset: 2px;
+          outline-color: transparent;
+          transition: outline-color 0.3s ease;
+        "
+        onfocus="this.style.outlineColor='var(--accent-color)'"
+        onblur="this.style.outlineColor='transparent'"
+      />
+    </div>
+    <button
+      type="submit"
+      style="
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: white;
+        background-color: var(--button-bg);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      "
+      onmouseover="this.style.backgroundColor='var(--button-hover-bg)'"
+      onmouseout="this.style.backgroundColor='var(--button-bg)'"
+    >
+      Sign Up
+    </button>
+  </form>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDHFyB_NyN9oLfOSDDcLMwlyWRKhj0oLj0",
+      authDomain: "proapp-5d45e.firebaseapp.com",
+      projectId: "proapp-5d45e",
+      storageBucket: "proapp-5d45e.firebasestorage.app",
+      messagingSenderId: "253077536591",
+      appId: "1:253077536591:web:88ac06c53ee377b1700f3a",
+      measurementId: "G-9QK0MPFER6"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    document.getElementById('signup-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          alert('Sign up successful! Please log in.');
+          window.location.href = '/login';
+        })
+        .catch(error => alert(error.message));
+    });
+  </script>
+{% endblock %}

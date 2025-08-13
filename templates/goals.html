@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Weekly Goals - SuperProd{% endblock %}
+
+{% block content %}
+<h1 class="mb-4 text-center">🎯 Weekly Goals</h1>
+
+<!-- Add Goal Form -->
+<form method="POST" action="{{ url_for('add_goal') }}" class="mb-4 d-flex justify-content-center gap-2 flex-wrap">
+  <input type="text" name="goal_title" class="form-control" placeholder="Add a new weekly goal..." style="max-width: 400px;" required />
+  <button type="submit" class="btn btn-warning fw-bold px-4">Add Goal</button>
+</form>
+
+<!-- Goals Stickers Container -->
+<div class="goals-container d-flex flex-wrap justify-content-center gap-3">
+
+  {% for goal in goals %}
+  <div class="goal-sticker p-3" style="background: {{ goal.color }};">
+    <h5 class="goal-title">{{ goal.title }}</h5>
+    <small class="text-muted">Added on {{ goal.created_at.strftime('%b %d') }}</small>
+    <form method="POST" action="{{ url_for('delete_goal', goal_id=goal.id) }}" class="mt-2 text-end">
+      <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
+    </form>
+  </div>
+  {% else %}
+  <p class="text-muted text-center mt-4">No weekly goals yet. Start adding some fun goals!</p>
+  {% endfor %}
+
+</div>
+
+<style>
+  .goals-container {
+    max-width: 900px;
+    margin: auto;
+  }
+  .goal-sticker {
+    width: 200px;
+    border-radius: 1rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    color: #222;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.2s ease;
+  }
+  .goal-sticker:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+  .goal-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+</style>
+
+{% endblock %}

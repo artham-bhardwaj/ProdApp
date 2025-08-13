@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Task App{% endblock %}
+
+{% block content %}
+  {% if 'firebase_user' in session %}
+    <p style="text-align: center; font-size: 1.2rem; margin-bottom: 2rem;">You are logged in!</p>
+  {% else %}
+    <h1>Welcome to Task App</h1>
+    <hr />
+    <h2>Add Temporary Tasks (No Login)</h2>
+    <form method="POST" action="{{ url_for('add_task') }}">
+      <input
+        type="text"
+        name="task"
+        placeholder="Enter task"
+        required
+        autocomplete="off"
+        style="
+          flex-grow: 1;
+          padding: 0.65rem 1.1rem;
+          font-size: 1rem;
+          border: none;
+          border-top-left-radius: 8px;
+          border-bottom-left-radius: 8px;
+          background-color: var(--input-bg);
+          color: var(--input-text);
+          outline-offset: 2px;
+          outline-color: transparent;
+          transition: outline-color 0.3s ease;
+        "
+        onfocus="this.style.outlineColor='var(--accent-color)'"
+        onblur="this.style.outlineColor='transparent'"
+      />
+      <button
+        type="submit"
+        style="
+          background-color: var(--button-bg);
+          border: none;
+          color: #fff;
+          font-weight: 700;
+          padding: 0 1.6rem;
+          cursor: pointer;
+          font-size: 1rem;
+          border-top-right-radius: 8px;
+          border-bottom-right-radius: 8px;
+          transition: background-color 0.3s ease;
+        "
+        onmouseover="this.style.backgroundColor='var(--button-hover-bg)'"
+        onmouseout="this.style.backgroundColor='var(--button-bg)'"
+      >Add</button>
+    </form>
+
+    <ul style="list-style:none; padding:0; max-height: 200px; overflow-y:auto; border-top: 1px solid var(--border-color);">
+      {% for task in temp_tasks %}
+        <li style="padding: 0.7rem 1rem; border-bottom: 1px solid var(--border-color); font-size: 1rem;">{{ task }}</li>
+      {% else %}
+        <li style="text-align:center; color:#666; font-style: italic;">No temporary tasks added yet.</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}

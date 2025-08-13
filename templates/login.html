@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Log In - Task App{% endblock %}
+
+{% block content %}
+  <h2 style="text-align: center; margin-bottom: 2rem; font-weight: 700; letter-spacing: 1px;">Log In</h2>
+
+  {% if error %}
+    <div style="max-width: 400px; margin: 0 auto 1rem; padding: 1rem; background: #f8d7da; color: #842029; border-radius: 8px;">
+      {{ error }}
+    </div>
+  {% endif %}
+
+  <form method="POST" action="{{ url_for('login') }}" style="max-width: 400px; margin: 0 auto;">
+    <div style="margin-bottom: 1.2rem;">
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        required
+        autocomplete="email"
+        style="
+          width: 100%;
+          padding: 0.65rem 1rem;
+          font-size: 1rem;
+          border-radius: 8px;
+          border: none;
+          background-color: var(--input-bg);
+          color: var(--input-text);
+          outline-offset: 2px;
+          outline-color: transparent;
+          transition: outline-color 0.3s ease;
+        "
+        onfocus="this.style.outlineColor='var(--accent-color)'"
+        onblur="this.style.outlineColor='transparent'"
+      />
+    </div>
+    <div style="margin-bottom: 1.8rem;">
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        required
+        autocomplete="current-password"
+        style="
+          width: 100%;
+          padding: 0.65rem 1rem;
+          font-size: 1rem;
+          border-radius: 8px;
+          border: none;
+          background-color: var(--input-bg);
+          color: var(--input-text);
+          outline-offset: 2px;
+          outline-color: transparent;
+          transition: outline-color 0.3s ease;
+        "
+        onfocus="this.style.outlineColor='var(--accent-color)'"
+        onblur="this.style.outlineColor='transparent'"
+      />
+    </div>
+    <button
+      type="submit"
+      style="
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: white;
+        background-color: var(--button-bg);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      "
+      onmouseover="this.style.backgroundColor='var(--button-hover-bg)'"
+      onmouseout="this.style.backgroundColor='var(--button-bg)'"
+    >
+      Log In
+    </button>
+  </form>
+{% endblock %}
