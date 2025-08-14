@@ -6,24 +6,24 @@ from firebase_admin import credentials, firestore
 import pyrebase
 
 firebaseConfig = {
-    "apiKey": "AIzaSyDHFyB_NyN9oLfOSDDcLMwlyWRKhj0oLj0",
-    "authDomain": "proapp-5d45e.firebaseapp.com",
-    "projectId": "proapp-5d45e",
-    "storageBucket": "proapp-5d45e.firebasestorage.app",
-    "messagingSenderId": "253077536591",
-    "appId": "1:253077536591:web:88ac06c53ee377b1700f3a",
-    "measurementId": "G-9QK0MPFER6",
-    "databaseURL":"https://proapp-5d45e-default-rtdb.firebaseio.com/",
+    "apiKey": "YOUR_API_KEY_HERE",
+    "authDomain": "YOUR_AUTH_DOMAIN_HERE",
+    "projectId": "YOUR_PROJECT_ID_HERE",
+    "storageBucket": "YOUR_STORAGE_BUCKET_HERE",
+    "messagingSenderId": "YOUR_MESSAGING_SENDER_ID_HERE",
+    "appId": "YOUR_APP_ID_HERE",
+    "measurementId": "YOUR_MEASUREMENT_ID_HERE",
+    "databaseURL": "YOUR_DATABASE_URL_HERE",
 }
 
 firebase = pyrebase.initialize_app(firebaseConfig)
 auth = firebase.auth()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'
+app.config['SECRET_KEY'] = 'YOUR_SECRET_KEY_HERE'
 
 # Initialize Firebase Admin SDK
-cred = credentials.Certificate('serviceAccountKey.json')  # Update your path here
+cred = credentials.Certificate('PATH_TO_YOUR_SERVICE_ACCOUNT_KEY_JSON')
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -65,8 +65,6 @@ def tasks():
         tasks.append(task)
 
     return render_template('tasks.html', tasks=tasks)
-
-
 
 @app.route('/toggle/<task_id>')
 def toggle_task(task_id):
@@ -126,7 +124,6 @@ def add_task():
     duration = request.form.get('duration')
 
     if not title:
-        # You can handle errors better here
         return redirect(url_for('tasks'))
 
     # Convert deadline string to datetime if provided
@@ -135,7 +132,7 @@ def add_task():
         try:
             deadline = datetime.strptime(deadline_str, '%Y-%m-%d')
         except ValueError:
-            deadline = None  # Ignore or handle invalid date format
+            deadline = None
 
     # Convert duration to int if provided
     duration_minutes = None
@@ -195,61 +192,20 @@ def show_goals():
 @app.route('/add_goal', methods=['POST'])
 def add_goal():
     title = request.form.get('goal_title')
-    if title:
-        color = random_pastel_color()
-        goal_data = {
-            'title': title,
-            'created_at': datetime.utcnow(),
-            'color': color
-        }
-        db.collection('weekly_goals').add(goal_data)
-    return redirect(url_for('show_goals'))
+    ifI'll break down the changes into smaller, more manageable sections to ensure they can be applied correctly. 
 
-@app.route('/delete_goal/<goal_id>', methods=['POST'])
-def delete_goal(goal_id):
-    db.collection('weekly_goals').document(goal_id).delete()
-    return redirect(url_for('show_goals'))
+### Changes to be made in `app.py`:
 
-# -------------------- AUTH ROUTES --------------------
+1. Replace the `apiKey`, `authDomain`, `projectId`, `storageBucket`, `messagingSenderId`, `appId`, `measurementId`, and `databaseURL` in the `firebaseConfig` dictionary with placeholder text.
+2. Replace the `SECRET_KEY` with a placeholder.
+3. Update the path to the service account key to a placeholder.
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
+I'll start with the first change.
 
-        try:
-            user = auth.sign_in_with_email_and_password(email, password)
-            session['firebase_user'] = user['idToken']
-            return redirect(url_for('tasks'))  # Or 'index' if you prefer
-        except Exception as e:
-            print("Login failed:", e)
-            return render_template('login.html', error="Invalid email or password.")
-    else:
-        return render_template('login.html')
-
-
-
-
-@app.route('/signup')
-def signup():
-    return render_template('signup.html')
-
-@app.route('/logout')
-def logout():
-    session.pop("firebase_user", None)
-    return redirect(url_for('home'))
-
-# -------------------- HOME -------------------
-
-@app.route('/')
-def home():
-    if 'firebase_user' in session:
-        return redirect(url_for('tasks'))  # already logged in, go to index
-    return render_template('home.html')  # not logged in, stay on home
-
-
-# -------------------- RUN --------------------
-
-if __name__ == '__main__':
-    app.run(debug=True)
+<edit_file>
+<path>app.py</path>
+<content>
+<<<<<<< SEARCH
+    "apiKey": "AIzaSyDHFyB_NyN9oLfOSDDcLMwlyWRKhj0oLj0",
+=======
+    "apiKey": "YOUR_FIREBASE_API_KEY",
